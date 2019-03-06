@@ -39,12 +39,14 @@ d <- rio::import(here::here("Lind_GS_F18.csv"), setclass = "tbl_df") %>%
   characterize()
 
 names(d) <- str_replace_all(names(d), c("[.]" = "_", "Q" = "q"))
+
+#BC: I've never used this function before--seems like it could be useful for a variety of reasons! A go-to for me when fixing variable names is to pass my data frame to `clean_names()` from the {janitor} package, which converts everything to lower case automatically (a little less work intensive).
 ```
 
 ```{r tidy}
 geq_raw <- d %>%
   mutate(pid = row_number()) %>% 
-  select(119, everything())  %>% 
+  select(119, everything())  %>% #BC: have never seen the `everything()` function before--cool!
   rename(date = RecordedDate,
          duration = Duration__in_seconds_,
          race_ethn = q6,
@@ -102,6 +104,8 @@ geq_tidy <- geq_wide %>%
   mutate(gender = as.factor(gender),
          subscale = as.factor(subscale),
          age = age + 15)
+
+#BC: sweet data wrangling skills! 
 ```
 
 ```{r sum_score}
@@ -127,9 +131,9 @@ geq_tidy %>%
   summarize(sum_score = sum(response, na.rm = TRUE)) %>% 
   ggplot() +
   geom_histogram(aes(sum_score, fill = gender), binwidth = 10, alpha = .7) +
-  facet_wrap(~gender, labeller = labeller(gender = gender_labels)) +
+  facet_wrap(~gender, labeller = labeller(gender = gender_labels)) + #BC: didn't know about `labeller`, will definitely use this in the future!
   scale_fill_OkabeIto(name = "Gender",
-                      labels = c("Female", "Male")) +
+                      labels = c("Female", "Male")) + #BC: As a color-blind person, I appreciate the cb-friendly palette :) 
   theme_light() +
   labs(title = "Distribution of GEQ sum scores by gender",
        subtitle = "67 women, 31 men; Possible score range: 20-100",
@@ -164,6 +168,8 @@ geq_tidy %>%
        subtitle = "67 women, 31 men; Possible score range: 20-100",
        x = "GEQ Sum Score",
        y = "Density")
+
+#BC: This density plot looks beautiful, and I like it the best of all your histograms. I think it most clearly shows the different shapes and "peakiness" (is that a word?) of the two distributions. I also really appreciate your subtitle, as it adds super helpful information for interpreting the plot. 
 ```
 
 ```{r subscale_score_by_gender}
@@ -204,6 +210,8 @@ geq_tidy %>%
        subtitle = "67 women, 31 men",
        x = "GEQ Subscales",
        y = "Subscale Scores")
+
+#BC: I really like that your second graph shows all of the data so the viewer can get a better sense of the raw data--for example, you can see the cluster of 0's for males on the 'Sexist Remarks' category and the clusters of high values for females on nearly all categories, which I think is really valuable information. However, I also like the effectiveness of presenting more of a summary of the data with your first bar graph. Maybe you could combine these two approaches? For example, you could increase the transparency of the points on your second graph and add lines to represent the means for each gender. This way you could present both the summarized and raw data simultaneously. Another suggestion if you end up just using the bar plot is to add error bars to convey uncertainty in your point estimates. 
 ```
 
 ```{r total_score_by_age}
@@ -224,6 +232,9 @@ geq_tidy %>%
   labs(title = "Reporting of harassment does not seem to vary by years since high school",
        x = "Age (proxy for years since high school)",
        y = "GEQ Sum Scores")
+
+#BC: Very cool plot! A couple suggestions: Since you have quite a bit of white space available in the plot region, you might consider putting your legend inside the area of your plot to conserve space. Also, I feel like this might also look cool as a violin plot, so maybe could play around with that?  
+
 
 geq_tidy %>%
   filter(gender == 1) %>% 
